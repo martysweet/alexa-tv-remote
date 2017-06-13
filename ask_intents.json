@@ -1,0 +1,159 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "ChannelChangeIntent",
+      "samples": [
+        "change to channel {Channel} ",
+        "channel {Channel} ",
+        "select channel {Channel} ",
+        "change to {Channel} ",
+        "for {Channel}",
+        "{Channel}"
+      ],
+      "slots": [
+        {
+          "name": "Channel",
+          "type": "ChannelWords",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "PowerIntent",
+      "samples": [
+        "put into {PowerChange} mode",
+        "put into {PowerChange} ",
+        "go into {PowerChange} ",
+        "turn {PowerChange} "
+      ],
+      "slots": [
+        {
+          "name": "PowerChange",
+          "type": "PowerChange",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "VolumeChangeIntent",
+      "samples": [
+        "{Volume} volume ",
+        "turn volume {Volume} "
+      ],
+      "slots": [
+        {
+          "name": "Volume",
+          "type": "VolumeChange",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "VolumeMuteIntent",
+      "samples": [
+        "mut",
+        "unmute"
+      ],
+      "slots": []
+    }
+  ],
+  "types": [
+    {
+      "name": "ChannelWords",
+      "values": [
+        {
+          "name": {
+            "value": "E4"
+          }
+        },
+        {
+          "name": {
+            "value": "Quest"
+          }
+        },
+        {
+          "name": {
+            "value": "Quest Plus One"
+          }
+        },
+        {
+          "name": {
+            "value": "BBC News"
+          }
+        },
+        {
+          "name": {
+            "value": "Challenge"
+          }
+        },
+        {
+          "name": {
+            "value": "Dave"
+          }
+        },
+        {
+          "name": {
+            "value": "E4 Plus One"
+          }
+        },
+        {
+          "name": {
+            "value": "BBC Two"
+          }
+        },
+        {
+          "name": {
+            "value": "ITV"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PowerChange",
+      "values": [
+        {
+          "name": {
+            "value": "on"
+          }
+        },
+        {
+          "name": {
+            "value": "off"
+          }
+        },
+        {
+          "name": {
+            "value": "standby"
+          }
+        }
+      ]
+    },
+    {
+      "name": "VolumeChange",
+      "values": [
+        {
+          "name": {
+            "value": "up"
+          }
+        },
+        {
+          "name": {
+            "value": "down"
+          }
+        }
+      ]
+    }
+  ]
+}
