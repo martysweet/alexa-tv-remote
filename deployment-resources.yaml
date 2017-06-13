@@ -80,6 +80,9 @@ Resources:
             Resource: "*"
           - Effect: Allow
             Action: iot:Subscribe
+            Resource: !Sub arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/alexa-tv-remote
+          - Effect: Allow
+            Action: iot:Receive
             Resource: !Sub arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/alexa-tv-remote
 
 

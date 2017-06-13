@@ -1,5 +1,6 @@
 from __future__ import print_function
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+from subprocess import call
 import json
 import sys
 import logging
@@ -15,13 +16,20 @@ AWS_IOT_ROOT_CA = 'root-CA.crt'
 AWS_IOT_PRIVATE_KEY = 'private.pem.key'
 AWS_IOT_CERTIFICATE = 'client.crt'
 
+
 # Custom MQTT message callback
-def customCallback(client, userdata, message):
-	print("Received a new message: ")
-	print(message.payload)
-	print("from topic: ")
-	print(message.topic)
-	print("--------------\n\n")
+def custom_callback(client, userdata, message):
+    print("Received a new message: ")
+    print(message.payload)
+    print("from topic: ")
+    print(message.topic)
+    print("--------------\n\n")
+
+    arr = json.loads(message.payload)
+
+    for a in arr:
+        call(["irsend", "SEND_ONCE", "Toshiba_CT-90287-TV", a])
+        time.sleep(0.2)
 
 
 # Configure logging
@@ -46,5 +54,7 @@ myAWSIoTMQTTClient.configureMQTTOperationTimeout(5)  # 5 sec
 
 # Connect and subscribe to AWS IoT
 myAWSIoTMQTTClient.connect()
-myAWSIoTMQTTClient.subscribe(AWS_IOT_SUBSCRIBE_TOPIC, 1, customCallback)
-time.sleep(2)
+myAWSIoTMQTTClient.subscribe(AWS_IOT_SUBSCRIBE_TOPIC, 1, custom_callback)
+
+while True:
+    time.sleep(1)

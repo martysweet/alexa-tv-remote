@@ -55,13 +55,13 @@ def channel_to_numerical(channel_name_input):
     mapping = {
                 'itv': 3,
                 'bbc two': 2,
-                'e4 plus one': 39,
-                'e4': 38,
+                'e4 plus 1': 29,
+                'e4': 28,
                 'dave': 40,
                 'challenge': 30,
                 'bbc news': 130,
                 'quest': 37,
-                'quest plus one': 38
+                'quest plus 1': 38
                }
 
     if channel_name in mapping:
