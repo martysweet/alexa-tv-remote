@@ -11,3 +11,5 @@ prod:
   APPLICATION_ROLE: 'arn:aws:iam::615078780108:role/alexa-tv-remote-ApplicationRole-1WIMZC05D7HZV'
   LAMBDA_REGION: 'eu-west-1'
 ```
+
+`aws configure --profile alexa-tv-remote`

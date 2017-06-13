@@ -115,8 +115,8 @@ def change_channel_intent(intent, session):
             numerical_channel = channel_to_numerical(intent['slots'][word_slot]['value'])
     else:
         print("channel intent received without slot populated")
-        end_session_with_message("Please clearly state a channel number or name.")
-        return
+        return end_session_with_message("Please clearly state a channel number or name.")
+
 
     # Send a request for this numerical channel, convert a number to KEY_X
     key_presses = []
@@ -128,7 +128,7 @@ def change_channel_intent(intent, session):
     send_iot_request(key_presses)
 
     # Return nicely
-    end_session_with_message("Changing channel.")
+    return end_session_with_message("Changing channel.")
 
 
 def send_iot_request(key_presses):
