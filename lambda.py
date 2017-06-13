@@ -8,7 +8,11 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
+import boto3
+import json
 
+iot_client = boto3.client('iot-data')
+AWS_IOT_PUBLISH_TOPIC = 'alexa-tv-remote'
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -18,11 +22,11 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
             'type': 'PlainText',
             'text': output
         },
-        'card': {
-            'type': 'Simple',
-            'title': "SessionSpeechlet - " + title,
-            'content': "SessionSpeechlet - " + output
-        },
+      #  'card': {
+      #      'type': 'Simple',
+      #      'title': "SessionSpeechlet - " + title,
+      #      'content': "SessionSpeechlet - " + output
+      #  },
         'reprompt': {
             'outputSpeech': {
                 'type': 'PlainText',
@@ -45,8 +49,9 @@ def slot_has_value(intent, name):
     return (name in intent['slots']) and ('value' in intent['slots'][name])
 
 
-def channel_to_numerical(channel_name):
+def channel_to_numerical(channel_name_input):
     """ Converts the word representation of a channel into it's numerical value. """
+    channel_name = channel_name_input.lower()
     mapping = {
                 'itv': 3,
                 'bbc two': 2,
@@ -63,8 +68,7 @@ def channel_to_numerical(channel_name):
         return mapping[channel_name]
     else:
         print("failed to find word channel channel="+channel_name)
-        return 1
-
+        return -1
 
 # --------------- Functions that control the skill's behavior ------------------
 
@@ -84,6 +88,13 @@ def get_welcome_response():
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+def send_speech_error_to_user():
+    card_title = "Error"
+    speech_output = "Sorry, I didn't quite catch that, what do you want to do?"
+    # Setting this to true ends the session and exits the skill.
+    should_end_session = False
+    return build_response({}, build_speechlet_response(
+        card_title, speech_output, None, should_end_session))
 
 def handle_session_end_request():
     card_title = "Session Ended"
@@ -94,7 +105,6 @@ def handle_session_end_request():
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
-
 def end_session_with_message(message):
     card_title = "Session Ended"
     # Setting this to true ends the session and exits the skill.
@@ -102,21 +112,45 @@ def end_session_with_message(message):
     return build_response({}, build_speechlet_response(
         card_title, message, None, should_end_session))
 
+def end_session_with_failed_iot():
+    end_session_with_message("Unable to send command to remote.")
+
+def send_iot_request(key_presses):
+    print("sending key presses")
+    for a in key_presses:
+        print(a)
+
+    body = json.dumps(key_presses)
+
+    try:
+        iot_client.publish(
+            topic=AWS_IOT_PUBLISH_TOPIC,
+            qos=0,
+            payload=body
+        )
+        return True
+    except Exception as e:
+        print("failed to send IOT" + str(e))
+        return False
+
+# --------------- Intents ------------------------------------------------------
 
 def change_channel_intent(intent, session):
     """ Changes the channel based on a Numeric or Word slot. """
-    word_slot = 'Channel'
-
-    if slot_has_value(intent, word_slot):
-        channel = intent['slots'][word_slot]['value']
+    if slot_has_value(intent, 'Channel'):
+        channel = intent['slots']['Channel']['value']
         if channel.isdigit():
             numerical_channel = int(channel)
         else:
-            numerical_channel = channel_to_numerical(intent['slots'][word_slot]['value'])
+            numerical_channel = channel_to_numerical(intent['slots']['Channel']['value'])
     else:
         print("channel intent received without slot populated")
-        return end_session_with_message("Please clearly state a channel number or name.")
+        return send_speech_error_to_user()
 
+    # Check the numerical_channel is indeed numeric and > 0
+    if not isinstance(numerical_channel, ( int, long ) ) or numerical_channel < 0:
+        print("channel invalid: " + str(numerical_channel))
+        return send_speech_error_to_user()
 
     # Send a request for this numerical channel, convert a number to KEY_X
     key_presses = []
@@ -125,17 +159,13 @@ def change_channel_intent(intent, session):
         key_presses.append('KEY_' + a)
 
     # Send key press array to IOT
-    send_iot_request(key_presses)
+    if send_iot_request(key_presses):
+        # Return nicely
+        return end_session_with_message("Changing channel.")
+    else:
+        # Return with IOT message
+        return end_session_with_failed_iot()
 
-    # Return nicely
-    return end_session_with_message("Changing channel.")
-
-
-def send_iot_request(key_presses):
-    print("sending key presses")
-
-    for a in key_presses:
-        print(a)
 
 
 # --------------- Events ------------------
