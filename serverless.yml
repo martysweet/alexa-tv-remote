@@ -1,0 +1,26 @@
+service: secure-upload
+
+frameworkVersion: ">=1.0.0 <2.0.0"
+
+provider:
+  name: aws
+  runtime: python2.7
+  profile: alexa-tv-remote
+  deploymentBucket: ${file(./serverless.env.yml):${opt:stage}.DEPLOYMENT_BUCKET}
+  role: ${file(./serverless.env.yml):${opt:stage}.APPLICATION_ROLE}
+  region: ${file(./serverless.env.yml):${opt:stage}.LAMBDA_REGION}
+  stage: prod
+
+package:
+  exclude:
+    - .git/**
+
+functions:
+
+  skill:
+    handler: lambda.lambda_handler
+    description: Alexa Skill to handle the incoming request from the Alexa service.
+    memorySize: 256
+    timeout: 15
+    events:
+      - alexaSkill
