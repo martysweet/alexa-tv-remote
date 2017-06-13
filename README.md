@@ -13,3 +13,6 @@ prod:
 ```
 
 `aws configure --profile alexa-tv-remote`
+
+
+`pip install AWSIoTPythonSDK`
