@@ -72,6 +72,7 @@ def channel_to_numerical(channel_name_input):
 
 # --------------- Functions that control the skill's behavior ------------------
 
+
 def get_welcome_response():
     """ If we wanted to initialize the session to have some attributes we could
     add those here
@@ -88,6 +89,7 @@ def get_welcome_response():
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+
 def send_speech_error_to_user():
     card_title = "Error"
     speech_output = "Sorry, I didn't quite catch that, what do you want to do?"
@@ -95,6 +97,7 @@ def send_speech_error_to_user():
     should_end_session = False
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
+
 
 def handle_session_end_request():
     card_title = "Session Ended"
@@ -105,6 +108,7 @@ def handle_session_end_request():
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
+
 def end_session_with_message(message):
     card_title = "Session Ended"
     # Setting this to true ends the session and exits the skill.
@@ -112,8 +116,10 @@ def end_session_with_message(message):
     return build_response({}, build_speechlet_response(
         card_title, message, None, should_end_session))
 
+
 def end_session_with_failed_iot():
     end_session_with_message("Unable to send command to remote.")
+
 
 def send_iot_request(key_presses):
     print("sending key presses")
@@ -133,7 +139,38 @@ def send_iot_request(key_presses):
         print("failed to send IOT" + str(e))
         return False
 
+
 # --------------- Intents ------------------------------------------------------
+def change_volume_intent(intent, session):
+    """ Increase or decrease the volume. """
+    if slot_has_value(intent, 'Volume'):
+        val = intent['slots']['Volume']['value']
+        if val == "up":
+            send_iot_request(['KEY_VOLUMEUP', 'KEY_VOLUMEUP', 'KEY_VOLUMEUP', 'KEY_VOLUMEUP'])
+            return end_session_with_message("Increasing volume")
+        else:
+            send_iot_request(['KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN'])
+            return end_session_with_message("Decreasing volume")
+    else:
+        print("volume intent received without slot populated")
+        return send_speech_error_to_user()
+
+
+def mute_intent(intent, session):
+    """ Mute the television. """
+    send_iot_request(['KEY_MUTE'])
+    return end_session_with_message("Pressing the mute button!")
+
+
+def change_power_intent(intent, session):
+    """ Press the power button. """
+    if slot_has_value(intent, 'PowerChange'):
+        send_iot_request(['KEY_POWER'])
+        return end_session_with_message("Pressing the power button")
+    else:
+        print("power intent received without slot populated")
+        return send_speech_error_to_user()
+
 
 def change_channel_intent(intent, session):
     """ Changes the channel based on a Numeric or Word slot. """
@@ -167,12 +204,9 @@ def change_channel_intent(intent, session):
         return end_session_with_failed_iot()
 
 
-
 # --------------- Events ------------------
-
 def on_session_started(session_started_request, session):
     """ Called when the session starts """
-
     print("on_session_started requestId=" + session_started_request['requestId']
           + ", sessionId=" + session['sessionId'])
 
@@ -200,6 +234,12 @@ def on_intent(intent_request, session):
     # Dispatch to your skill's intent handlers
     if intent_name == "ChannelChangeIntent":
         return change_channel_intent(intent, session)
+    elif intent_name == "PowerIntent":
+        return change_power_intent(intent, session)
+    elif intent_name == "VolumeChangeIntent":
+        return change_volume_intent(intent, session)
+    elif intent_name == "VolumeMuteIntent":
+        return mute_intent(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
