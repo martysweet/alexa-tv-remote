@@ -1,0 +1,102 @@
+---
+Description: Deployment and IOT resources for Alexa TV Remote
+
+Resources:
+
+  DeploymentBucket:
+    Type: AWS::S3::Bucket
+
+  DeploymentUser:
+    Type: AWS::IAM::User
+
+  ApplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+
+  DeploymentPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: "/"
+      Users:
+        - !Ref DeploymentUser
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: s3:*
+          Resource:
+          - !Sub arn:aws:s3:::${DeploymentBucket}/*
+          - !Sub arn:aws:s3:::${DeploymentBucket}
+        - Effect: Allow
+          Action: lambda:Create*
+          Resource: arn:aws:lambda:*
+        - Effect: Allow
+          Action: lambda:*
+          Resource: arn:aws:lambda:*:*:function:alexa-tv-remote*
+        - Effect: Allow
+          Action: iam:PassRole
+          Resource: !GetAtt ApplicationRole.Arn
+
+  ApplicationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref ApplicationRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:DescribeLogGroups
+          - logs:DescribeLogStreams
+          - logs:FilterLogEvents
+          - logs:GetLogEvents
+          - logs:PutLogEvents
+          Resource:
+          - "*"
+        - Effect: Allow
+          Action: iot:Publish
+          Resource: !Sub arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/alexa-tv-remote
+
+  IotPolicy:
+    Type: AWS::IoT::Policy
+    Properties:
+      PolicyName: alexa-tv-remote-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: iot:Connect
+            Resource: "*"
+          - Effect: Allow
+            Action: iot:Subscribe
+            Resource: !Sub arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/alexa-tv-remote
+
+
+Outputs:
+
+  IotPolicy:
+    Description: The policy for your IOT Device to use, be sure to attach this to the certificate.
+    Value: !Ref IotPolicy
+
+  ApplicationRoleArn:
+    Description: This is the role to be used with your Lambda function, as specified in serverless.yml.
+    Value: !GetAtt ApplicationRole.Arn
+
+  DeploymentUserArn:
+    Description: User to deploy the application with, create a access key and store in your ~/.aws/credentials.
+    Value: !GetAtt DeploymentUser.Arn
+
+  DeploymentBucket:
+    Description: Bucket to be used by the serverless framework to upload your stack, specify this in serverless.yml.
+    Value: !Ref DeploymentBucket
