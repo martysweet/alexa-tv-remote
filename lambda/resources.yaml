@@ -43,6 +43,15 @@ Resources:
         - Effect: Allow
           Action: iam:PassRole
           Resource: !GetAtt ApplicationRole.Arn
+        - Effect: Allow
+          Action: cloudformation:*
+          Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/alexa-tv-remote-*
+        - Effect: Allow
+          Action: logs:*
+          Resource:
+           - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group::log-stream*
+           - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/alexa-tv-remote-*
+
 
   ApplicationPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -71,7 +80,6 @@ Resources:
   IotPolicy:
     Type: AWS::IoT::Policy
     Properties:
-      PolicyName: alexa-tv-remote-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
