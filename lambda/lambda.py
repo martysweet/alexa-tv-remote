@@ -145,10 +145,10 @@ def change_volume_intent(intent, session):
     """ Increase or decrease the volume. """
     if slot_has_value(intent, 'Volume'):
         val = intent['slots']['Volume']['value']
-        if val == "up":
+        if val == "up" or val == "increase":
             send_iot_request(['KEY_VOLUMEUP', 'KEY_VOLUMEUP', 'KEY_VOLUMEUP', 'KEY_VOLUMEUP'])
             return end_session_with_message("Increasing volume")
-        else:
+        elif val == "down" or val == "decrease":
             send_iot_request(['KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN', 'KEY_VOLUMEDOWN'])
             return end_session_with_message("Decreasing volume")
     else:

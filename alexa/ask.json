@@ -1,1 +1,306 @@
-{  "intents": [    {      "name": "AMAZON.CancelIntent",      "samples": []    },    {      "name": "AMAZON.HelpIntent",      "samples": []    },    {      "name": "AMAZON.StopIntent",      "samples": []    },    {      "name": "ChannelChangeIntent",      "samples": [        "change to channel {Channel} ",        "channel {Channel} ",        "select channel {Channel} ",        "change to {Channel} ",        "for {Channel}",        "I want channel {Channel} ",        "I want {Channel} ",        "switch to channel {Channel} ",        "switch to {Channel} ",        "show me channel {Channel} ",        "show me {Channel} ",        "put on channel {Channel} ",        "put on {Channel} ",        "go to channel {Channel} ",        "go to {Channel} ",        "give me channel {Channel} ",        "give me {Channel} "      ],      "slots": [        {          "name": "Channel",          "type": "ChannelWords",          "samples": [            "Channel {Channel} ",            "put on {Channel} ",            "{Channel} "          ]        }      ]    },    {      "name": "PowerIntent",      "samples": [        "put into {PowerChange} mode",        "put into {PowerChange} ",        "go into {PowerChange} ",        "turn {PowerChange} ",        "to turn {PowerChange} ",        "turn in {PowerChange} ",        "change power to {PowerChange} ",        "press the {PowerChange} button"      ],      "slots": [        {          "name": "PowerChange",          "type": "PowerChange",          "samples": [            "turn the tv {PowerChange} ",            "turn the television {PowerChange} ",            "{PowerChange} "          ]        }      ]    },    {      "name": "VolumeChangeIntent",      "samples": [        "{Volume} volume ",        "turn volume {Volume} "      ],      "slots": [        {          "name": "Volume",          "type": "VolumeChange",          "samples": [            "turn the volume {Volume} ",            "turn it {Volume} ",            "{Volume} "          ]        }      ]    },    {      "name": "VolumeMuteIntent",      "samples": [        "unmute",        "mute",        "mute television",        "mute tv",        "unmute tv",        "unmute television"      ],      "slots": []    }  ],  "types": [    {      "name": "ChannelWords",      "values": [        {          "name": {            "value": "E4"          }        },        {          "name": {            "value": "Quest"          }        },        {          "name": {            "value": "Quest Plus One"          }        },        {          "name": {            "value": "BBC News"          }        },        {          "name": {            "value": "Challenge"          }        },        {          "name": {            "value": "Dave"          }        },        {          "name": {            "value": "E4 Plus One"          }        },        {          "name": {            "value": "BBC Two"          }        },        {          "name": {            "value": "ITV"          }        }      ]    },    {      "name": "PowerChange",      "values": [        {          "name": {            "value": "on"          }        },        {          "name": {            "value": "off"          }        },        {          "name": {            "value": "standby"          }        }      ]    },    {      "name": "VolumeChange",      "values": [        {          "name": {            "value": "up"          }        },        {          "name": {            "value": "down"          }        }      ]    }  ],  "prompts": [    {      "id": "Elicit.Intent-ChannelChangeIntent.IntentSlot-Channel",      "promptVersion": "1.0",      "definitionVersion": "1.0",      "variations": [        {          "type": "PlainText",          "value": "Which channel would you like?"        }      ]    },    {      "id": "Elicit.Intent-PowerIntent.IntentSlot-PowerChange",      "promptVersion": "1.0",      "definitionVersion": "1.0",      "variations": [        {          "type": "PlainText",          "value": "Would you like to turn the tv on or off?"        }      ]    },    {      "id": "Confirm.Intent-PowerIntent.IntentSlot-PowerChange",      "promptVersion": "1.0",      "definitionVersion": "1.0",      "variations": [        {          "type": "PlainText",          "value": "Are you sure you want to turn the tv {PowerChange} ?"        }      ]    },    {      "id": "Elicit.Intent-VolumeChangeIntent.IntentSlot-Volume",      "promptVersion": "1.0",      "definitionVersion": "1.0",      "variations": [        {          "type": "PlainText",          "value": "Do you want to turn the volume up or down?"        }      ]    }  ],  "dialog": {    "version": "1.0",    "intents": [      {        "name": "ChannelChangeIntent",        "confirmationRequired": false,        "prompts": {},        "slots": [          {            "name": "Channel",            "type": "ChannelWords",            "elicitationRequired": true,            "confirmationRequired": false,            "prompts": {              "elicit": "Elicit.Intent-ChannelChangeIntent.IntentSlot-Channel"            }          }        ]      },      {        "name": "PowerIntent",        "confirmationRequired": false,        "prompts": {},        "slots": [          {            "name": "PowerChange",            "type": "PowerChange",            "elicitationRequired": true,            "confirmationRequired": true,            "prompts": {              "elicit": "Elicit.Intent-PowerIntent.IntentSlot-PowerChange",              "confirm": "Confirm.Intent-PowerIntent.IntentSlot-PowerChange"            }          }        ]      },      {        "name": "VolumeChangeIntent",        "confirmationRequired": false,        "prompts": {},        "slots": [          {            "name": "Volume",            "type": "VolumeChange",            "elicitationRequired": true,            "confirmationRequired": false,            "prompts": {              "elicit": "Elicit.Intent-VolumeChangeIntent.IntentSlot-Volume"            }          }        ]      },      {        "name": "VolumeMuteIntent",        "confirmationRequired": false,        "prompts": {},        "slots": []      }    ]  }}
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "ChannelChangeIntent",
+      "samples": [
+        "change to channel {Channel} ",
+        "channel {Channel} ",
+        "select channel {Channel} ",
+        "change to {Channel} ",
+        "for {Channel}",
+        "I want channel {Channel} ",
+        "I want {Channel} ",
+        "switch to channel {Channel} ",
+        "switch to {Channel} ",
+        "show me channel {Channel} ",
+        "show me {Channel} ",
+        "put on channel {Channel} ",
+        "put on {Channel} ",
+        "go to channel {Channel} ",
+        "go to {Channel} ",
+        "give me channel {Channel} ",
+        "give me {Channel} "
+      ],
+      "slots": [
+        {
+          "name": "Channel",
+          "type": "ChannelWords",
+          "samples": [
+            "Channel {Channel} ",
+            "put on {Channel} ",
+            "{Channel} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PowerIntent",
+      "samples": [
+        "put into {PowerChange} mode",
+        "put into {PowerChange} ",
+        "go into {PowerChange} ",
+        "turn {PowerChange} ",
+        "to turn {PowerChange} ",
+        "turn in {PowerChange} ",
+        "change power to {PowerChange} ",
+        "press the {PowerChange} button"
+      ],
+      "slots": [
+        {
+          "name": "PowerChange",
+          "type": "PowerChange",
+          "samples": [
+            "turn the tv {PowerChange} ",
+            "turn the television {PowerChange} ",
+            "{PowerChange} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VolumeChangeIntent",
+      "samples": [
+        "{Volume} volume ",
+        "turn volume {Volume} "
+      ],
+      "slots": [
+        {
+          "name": "Volume",
+          "type": "VolumeChange",
+          "samples": [
+            "turn the volume {Volume} ",
+            "turn it {Volume} ",
+            "{Volume} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VolumeMuteIntent",
+      "samples": [
+        "unmute",
+        "mute",
+        "mute television",
+        "mute tv",
+        "unmute tv",
+        "unmute television"
+      ],
+      "slots": []
+    }
+  ],
+  "types": [
+    {
+      "name": "ChannelWords",
+      "values": [
+        {
+          "name": {
+            "value": "E4"
+          }
+        },
+        {
+          "name": {
+            "value": "Quest"
+          }
+        },
+        {
+          "name": {
+            "value": "Quest Plus One"
+          }
+        },
+        {
+          "name": {
+            "value": "BBC News"
+          }
+        },
+        {
+          "name": {
+            "value": "Challenge"
+          }
+        },
+        {
+          "name": {
+            "value": "Dave"
+          }
+        },
+        {
+          "name": {
+            "value": "E4 Plus One"
+          }
+        },
+        {
+          "name": {
+            "value": "BBC Two"
+          }
+        },
+        {
+          "name": {
+            "value": "ITV"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PowerChange",
+      "values": [
+        {
+          "name": {
+            "value": "on"
+          }
+        },
+        {
+          "name": {
+            "value": "off"
+          }
+        },
+        {
+          "name": {
+            "value": "standby"
+          }
+        }
+      ]
+    },
+    {
+      "name": "VolumeChange",
+      "values": [
+        {
+          "name": {
+            "value": "up"
+          }
+        },
+        {
+          "name": {
+            "value": "down"
+          }
+        },
+        {
+          "name": {
+            "value": "increase"
+          }
+        },
+        {
+          "name": {
+            "value": "decrease"
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-ChannelChangeIntent.IntentSlot-Channel",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Which channel would you like?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-PowerIntent.IntentSlot-PowerChange",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Would you like to turn the tv on or off?"
+        }
+      ]
+    },
+    {
+      "id": "Confirm.Intent-PowerIntent.IntentSlot-PowerChange",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Are you sure you want to turn the tv {PowerChange} ?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-VolumeChangeIntent.IntentSlot-Volume",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Do you want to turn the volume up or down?"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "ChannelChangeIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Channel",
+            "type": "ChannelWords",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-ChannelChangeIntent.IntentSlot-Channel"
+            }
+          }
+        ]
+      },
+      {
+        "name": "PowerIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "PowerChange",
+            "type": "PowerChange",
+            "elicitationRequired": true,
+            "confirmationRequired": true,
+            "prompts": {
+              "elicit": "Elicit.Intent-PowerIntent.IntentSlot-PowerChange",
+              "confirm": "Confirm.Intent-PowerIntent.IntentSlot-PowerChange"
+            }
+          }
+        ]
+      },
+      {
+        "name": "VolumeChangeIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "Volume",
+            "type": "VolumeChange",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-VolumeChangeIntent.IntentSlot-Volume"
+            }
+          }
+        ]
+      },
+      {
+        "name": "VolumeMuteIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      }
+    ]
+  }
+}
