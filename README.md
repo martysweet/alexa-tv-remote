@@ -86,17 +86,38 @@ at the 'Outputs' section.
 
 ![Deployed CloudFormation](screenshots/cloudformation-deployed.png)
 
-Next, we are going to create an Access Key for our Deployment User and
-setup our [AWS CLI command line tool](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)].
+For reference, we have the following resources created:
+- arn:aws:iam::062003756207:role/alexa-tv-remote-ApplicationRole-1IO44IHND9BGT
+- arn:aws:iam::062003756207:user/alexa-tv-remote-DeploymentUser-P4618MAD7BAG
+- alexa-tv-remote-deploymentbucket-fqcs8cex2orr	
+- alexa-tv-remote-IotPolicy-OGD6CZAM8KVZ	
 
-_TODO: Image_
 
-Configure the Access Keys and Secret Key into a profile called `alexa-tv-remote`.
+Next we need to setup access keys for our deployment user.
+Navigate to [IAM](https://console.aws.amazon.com/iam/home/) in 
+the AWS Console, click on 'Users' and locate your created 
+`alexa-tv-remote-DeploymentUser`. Click on the user, click on the 
+'Security Credentials' tab and finally click 'Create Access Key'.
+
+Copy the Access key ID and Secret access key to somewhere, like a notepad.
+You should treat these keys as private, anyone with access to them will have
+access into your AWS account!
+
+Once you have created an access key, your IAM user should look similar to
+this.
+
+![IAM Deploy User](screenshots/iam-deployment-user.png)
+
+Once the deployment user has active access keys, we are going to create 
+we need to setup our [AWS CLI command line tool](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+
+First, ensure you have the AWS CLI installed then run the below command
+to configure the Access Keys and Secret Key into a profile called `alexa-tv-remote`.
 
 ```
 $ aws configure --profile alexa-tv-remote
-AWS Access Key ID [None]: MYACCESSKEY
-AWS Secret Access Key [None]: MYSECRETKEY
+AWS Access Key ID [None]: MYACCESSKEYIJUSTCREATED
+AWS Secret Access Key [None]: MYSECRETKEYIJUSTCREATED
 Default region name [eu-west-1]: eu-west-1
 Default output format [json]: json
 ```
@@ -113,14 +134,27 @@ sure you are working in the `lambda` directory.
 $ cd lambda
 $ pwd
 /your/dev/path/alexa-tv-remote/lambda
-$ serverless deploy --stage prod
 ```
 
-If that worked, you should see a Lambda function within the AWS Console.
-This function will be executed by the Alexa service when triggered by 
-a voice invocation.
+Update the `serverless.env.yml` file with the outputs of the CloudFormation 
+template we created earlier.
 
-_TODO: Image_
+![Serverless Config](screenshots/serverless-environments.png)
+
+Now, lets deploy with serverless!
+`$ serverless deploy --stage prod`
+
+![Serverless Deployment](screenshots/serverless-deploy-success.png)
+
+If that worked, you should see a [Lambda](https://eu-west-1.console.aws.amazon.com/lambda/home) 
+function within the AWS Console. This function will be triggered by the 
+Alexa service when a user asks Alexa for the skill.
+
+![Lambda Deployed](screenshots/lambda-deployed.png)
+
+Take a note of your Lambda Amazon Resource Name (ARN), you will need this later.
+In our example, the ARN is:
+- arn:aws:lambda:eu-west-1:062003756207:function:alexa-tv-remote-prod-skill
 
 ### AWS IOT
 
@@ -128,22 +162,109 @@ The next step is to setup your AWS IOT device, and download the certificates
 which your RaspberryPi will use to authenticate itself with the service.
 
 The Lambda function we setup above will use the IOT service to send messages
-in real time your the RaspberryPi.
+in real time your the RaspberryPi, which will use the messages to control
+the IR LED.
 
-First, go to the AWS IOT service within the AWS Console.
+First, go to the [AWS IOT](https://eu-west-1.console.aws.amazon.com/iotv2/home) 
+service within the AWS Console. If you are a new user, you may need to 
+click 'Get Started'. From there, click 'Registry' then 'Things'.
 
-_TODO: Image_
+![IOT Register Thing](screenshots/iot-register-thing-splash.png)
 
-From here, click Create Device, and follow the steps. 
+We are going to name the thing `alexa-tv-remote-thing`.
 
-Next, attach the `alexa-tv-remote` policy to your certificate. This was
-created from the CloudFormation template we deployed earlier.
+![IOT Thing Name](screenshots/iot-thing-name.png)
+
+Click 'Create Thing', then click on 'Security'. 
+
+![IOT Create Certificate Splash](screenshots/iot-create-certificate-splash.png)
+
+Click 'Create Certificate'.
+
+![IOT Certificate Created](screenshots/iot-certificate-created.png)
+
+From this page, download all 4 certificates and save them into the `rpi` folder
+within your local copy of this repository. When downloading the root CA certificate,
+be sure to name it `root-CA.crt`. Your folder should then look like the following:
+
+![IOT Downloaded Certificates](screenshots/iot-downloaded-certificates.png)
+
+By default, the `rpi.py` script expects `root-CA.crt`, `private.pem.key` and `client.crt`,
+so we will rename our certificates to meet those file names.
+
+```
+$ mv 68be1a2be9-certificate.pem.crt client.crt
+$ mv 68be1a2be9-private.pem.key private.pem.key
+```
+
+We will be using those certificates shortly. Back in the AWS Console,
+click the 'Attach a Policy' button and select the `alexa-tv-remote` policy 
+which the CloudFormation template created earlier. Click the 'Done' button once selected.
+
+![IOT Select Policy](screenshots/iot-select-policy.png)
+
+Great! That's all that's needed in the AWS IOT console, we will test out
+the certificates in the RPi section below.
 
 ### Alexa
 
+To create an Alexa skill, log into the [AWS Develop Console](https://developer.amazon.com/edw/home.html#/skills)
+and be sure to click on the 'Alexa' tab then 'Alexa Skills Kit'. Next, click
+on 'Add new Skill'.
+
+Fill in the fields as below:
+
+![Alexa Create Skill](screenshots/alexa-create-skill.png)
+
+Click save, next launch the beta 'Skill Builder'
+
+![Alexa Interaction model](screenshots/alexa-interaction-model.png)
+
+Click on 'Code Editor', then drag and drop the `alexa/ask.json` file 
+into your browser. Click 'Apply Changes', 'Save Model' then 'Build Model'.
+
+![Alexa Code Editor](screenshots/alexa-code-editor.png)
+
+Once the model has successfully built, click 'Configuration'.
+Populate the Lambda invocation ARN with the Lambda functions ARN we created
+earlier and click 'Next'.
+
+![Alexa Lambda Configuration](screenshots/alexa-configuration.png)
+
+
+Great! Our Alexa skill is setup! Let's run a quick test in the next
+section to ensure everything is working as expected.
+
+#### Testing Alexa -> Lambda -> IOT
+
+First, pop back to the AWS IOT console and open the ['Test' section](https://eu-west-1.console.aws.amazon.com/iotv2/home?region=eu-west-1#/test).
+From here we can subscribe to topics to check the Lambda function is 
+outputting data which is going to be consumed by the RapsberryPi.
+Enter `alexa-tv-remote` and click 'Subscribe to Topic'. Click on the
+topic to the left to see the stream.
+
+![IOT Subscribe Test](screenshots/iot-subscribe-topic.png)
+
+Next, we are going to use the Alexa similator to invocate the lambda
+fucntion which will push a message into the IOT topic. Pop back
+to the Alexa testing panel and enter the following phrase "change 
+channel to BBC News" before clicking 'Ask Alexa TV Remote'.
+
+![Alexa Test Request](screenshots/alexa-test-request.png)
+ 
+ 
+If all has gone well, you should see the following message on the IOT Topic!
+ 
+![IOT Test Request](screenshots/iot-change-message.png)
+ 
+This array is going to tell the RapsberryPi to send infrared signals for
+KEY_1, KEY_3 then KEY_0 in sequence, changing channel to 130, which is 
+BBC News on Freeview.
+
 
 ### RPi
-Deploy Cloudformation template
+
+
 
 Create a `serverless.env.yml` file, changing the parameters to the outputs of your stack, for example:
 
