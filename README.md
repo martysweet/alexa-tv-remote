@@ -3,7 +3,7 @@
 This is a simple fun project to send commands to your TV using a standard
 Alexa skill. Once created, Alexa will invoke your Lambda function, which
 will interpret your response and publish the required command into an
-AWS IOT topic. The Raspberry Pi (RPi) subscribes to this topic and coverts
+AWS IOT topic. The Raspberry Pi (RPi) subscribes to this topic and converts
 the received messages into IR pulses for your TV to interpret.
 
 The Alexa Skill Kit also has a Video skill, which provides a fixed set
