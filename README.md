@@ -17,7 +17,7 @@ Further improvements to this skill could be as follows:
 - Allow the user to ask for a programme, it would be expected that the
  correct channel would be found or a schedule/reminder could be set. 
 
-_TODO: Video of the skill working_
+_TODO: Video of the skill in action_
 
 ## Finding your way round
 
