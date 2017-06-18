@@ -282,10 +282,13 @@ with all the certificates created earlier.
 ```
 pi@raspberrypi:~ $ mkdir alexa-tv-remote
 user@desktop:PROJECTPATH $ scp rpi/* pi@rpi-ip-address:~/alexa-tv-remote/
-pi@raspberrypi:~ $ cd alexa-tv-remote && ls
+pi@raspberrypi:~ $ cd alexa-tv-remote && ls -lh
+-rw-r--r-- 1 pi pi  451 Jun 18 11:56 68be1a2be9-public.pem.key
+-rw-r--r-- 1 pi pi 1.2K Jun 18 11:56 client.crt
+-rw-r--r-- 1 pi pi 1.7K Jun 18 11:56 private.pem.key
+-rw-r--r-- 1 pi pi 1.8K Jun 18 11:56 root-CA.crt
+-rw-r--r-- 1 pi pi 2.0K Jun 18 11:56 rpi.py
 
-pi@raspberrypi:~ $ cd alexa-tv-remote && ls
-68be1a2be9-public.pem.key  client.crt  private.pem.key  root-CA.crt  rpi.py
 ```
 
 Next, install the `AWSIotPythonSDK` onto the RPI.
