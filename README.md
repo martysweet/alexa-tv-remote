@@ -193,12 +193,13 @@ By default, the `rpi.py` script expects `root-CA.crt`, `private.pem.key` and `cl
 so we will rename our certificates to meet those file names.
 
 ```
+$ cd rpi
 $ mv 68be1a2be9-certificate.pem.crt client.crt
 $ mv 68be1a2be9-private.pem.key private.pem.key
 ```
 
-We will be using those certificates shortly. Back in the AWS Console,
-click the 'Attach a Policy' button and select the `alexa-tv-remote` policy 
+We will be using those certificates shortly. Back in the AWS Console, click on the 'Active' button then
+click the 'Attach a Policy' button and select the `alexa-tv-remote-....` policy 
 which the CloudFormation template created earlier. Click the 'Done' button once selected.
 
 ![IOT Select Policy](screenshots/iot-select-policy.png)
@@ -264,18 +265,96 @@ BBC News on Freeview.
 
 ### RPi
 
+To setup the hardware for your RapsberryPi, use the following tutorial
+http://www.raspberry-pi-geek.com/Archive/2015/10/Raspberry-Pi-IR-remote.
 
-
-Create a `serverless.env.yml` file, changing the parameters to the outputs of your stack, for example:
-
-```yaml
-prod:
-  DEPLOYMENT_BUCKET: 'alexa-tv-remote-deploymentbucket-1vyjbj2lfd52z'
-  APPLICATION_ROLE: 'arn:aws:iam::00000000000:role/alexa-tv-remote-ApplicationRole-1WIMZC05D7HZV'
-  LAMBDA_REGION: 'eu-west-1'
+Note additionally you may need to add the following to your `/boot/config.txt` file,
+where the GPIO pin matches the one you will be using then reboot.
+```
+dtoverlay=lirc-rpi,gpio_out_pin=5
 ```
 
-`aws configure --profile alexa-tv-remote`
+You can test the setup has worked by manually invoking LIRC using the `irsend` command.
+
+Next, if you are working on another machine, copy your `rpi` folder onto your RPi along
+with all the certificates created earlier.
+
+```
+pi@raspberrypi:~ $ mkdir alexa-tv-remote
+user@desktop:PROJECTPATH $ scp rpi/* pi@rpi-ip-address:~/alexa-tv-remote/
+pi@raspberrypi:~ $ cd alexa-tv-remote && ls
+
+pi@raspberrypi:~ $ cd alexa-tv-remote && ls
+68be1a2be9-public.pem.key  client.crt  private.pem.key  root-CA.crt  rpi.py
+```
+
+Next, install the `AWSIotPythonSDK` onto the RPI.
+
+```
+pi@raspberrypi:~/alexa-tv-remote $ pip install AWSIoTPythonSDK -t .
+Downloading/unpacking AWSIoTPythonSDK
+  Downloading AWSIoTPythonSDK-1.1.1.tar.gz (55kB): 55kB downloaded
+  Running setup.py (path:/tmp/pip-build-0TSMsZ/AWSIoTPythonSDK/setup.py) egg_info for package AWSIoTPythonSDK
+    
+Installing collected packages: AWSIoTPythonSDK
+  Running setup.py install for AWSIoTPythonSDK
+    
+Successfully installed AWSIoTPythonSDK
+Cleaning up...
+```
+
+Now lets run it! Once it's running, use the Alexa development portal
+to resend the test request to made above. If all goes well, you should 
+see the message be received and your TV should change channel!
+
+```
+pi@raspberrypi:~/alexa-tv-remote $ python rpi.py 
+2017-06-18 12:01:14,655 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Paho MQTT Client init.
+2017-06-18 12:01:14,658 - AWSIoTPythonSDK.core.protocol.mqttCore - INFO - ClientID: alexa-tv-remote-device
+2017-06-18 12:01:14,659 - AWSIoTPythonSDK.core.protocol.mqttCore - INFO - Protocol: MQTTv3.1.1
+2017-06-18 12:01:14,663 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Register Paho MQTT Client callbacks.
+2017-06-18 12:01:14,667 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - mqttCore init.
+2017-06-18 12:01:14,670 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Load CAFile from: root-CA.crt
+2017-06-18 12:01:14,674 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Load Key from: private.pem.key
+2017-06-18 12:01:14,677 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Load Cert from: client.crt
+2017-06-18 12:01:14,681 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for backoff timing: baseReconnectTime = 1 sec
+2017-06-18 12:01:14,684 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for backoff timing: maximumReconnectTime = 32 sec
+2017-06-18 12:01:14,687 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for backoff timing: minimumConnectTime = 20 sec
+2017-06-18 12:01:14,691 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for publish queueing: queueSize = -1
+2017-06-18 12:01:14,694 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for publish queueing: dropBehavior = Drop Newest
+2017-06-18 12:01:14,698 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Custom setting for draining interval: 0.5 sec
+2017-06-18 12:01:14,701 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Set maximum connect/disconnect timeout to be 10 second.
+2017-06-18 12:01:14,705 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Set maximum MQTT operation timeout to be 5 second
+2017-06-18 12:01:14,709 - AWSIoTPythonSDK.core.protocol.mqttCore - INFO - Connection type: TLSv1.2 Mutual Authentication
+2017-06-18 12:01:15,270 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Connect result code 0
+2017-06-18 12:01:15,272 - AWSIoTPythonSDK.core.protocol.mqttCore - INFO - Connected to AWS IoT.
+2017-06-18 12:01:15,276 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Connect time consumption: 60.0ms.
+2017-06-18 12:01:15,283 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Started a subscribe request 1
+2017-06-18 12:01:15,330 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - _resubscribeCount: -1
+2017-06-18 12:01:15,332 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Subscribe request 1 sent.
+2017-06-18 12:01:15,342 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Subscribe request 1 succeeded. Time consumption: 50.0ms.
+2017-06-18 12:01:15,344 - AWSIoTPythonSDK.core.protocol.mqttCore - DEBUG - Recover subscribe context for the next request: subscribeSent: False
+Received a new message: 
+["KEY_1", "KEY_3", "KEY_0"]
+from topic: 
+alexa-tv-remote
+--------------
+```
+
+You will now be able in invoke you skill using the following methods, 
+and the request will get through to your RapsberryPi.
+
+- Alexa, ask television to change channel to channel 4
+- Alexa, ask television to change channel to Quest
+- Alexa, open television
+  - change channel to channel 4
+  
+Feel free to experiment within the Skill Builder to improve the 
+interface in which you can interact with the Alexa skill!
 
 
-`pip install AWSIoTPythonSDK`
+## Questions
+
+If you have any questions, open an issue with as much information as possible.
+Be sure to obscure any private/secret information, such as your deployment keys and
+account id.
