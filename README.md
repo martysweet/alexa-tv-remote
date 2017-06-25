@@ -17,7 +17,10 @@ Further improvements to this skill could be as follows:
 - Allow the user to ask for a programme, it would be expected that the
  correct channel would be found or a schedule/reminder could be set. 
 
-_TODO: Video of the skill in action_
+### Youtube Video
+[![Youtube Video](http://img.youtube.com/vi/9lI3Rk-w2vo/0.jpg)](http://www.youtube.com/watch?v=9lI3Rk-w2vo "Youtube Video")
+
+https://www.youtube.com/watch?v=9lI3Rk-w2vo
 
 ## Finding your way round
 
